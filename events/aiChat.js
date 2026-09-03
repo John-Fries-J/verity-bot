@@ -8,8 +8,6 @@ const {
 const {
   buildFallbackReply,
   buildLoreBrief,
-  INTRO_LINES,
-  pickRandom,
 } = require("../verityLore");
 
 const config = getConfig();
@@ -18,7 +16,6 @@ const aiChat = config.aiChat || {};
 let openai = null;
 let openaiInitAttempted = false;
 let missingKeyWarned = false;
-let lastRandomReply = 0;
 
 const channelHistory = new Map();
 const channelActivity = new Map();
@@ -71,17 +68,6 @@ function normalizeChance(value, fallback) {
   return parsed;
 }
 
-function getRandomReplyChance(channelId) {
-  const fallback = normalizeChance(aiChat.randomReplyChance, 0.015);
-  const overrides = aiChat.channelReplyChanceOverrides || {};
-
-  if (!Object.prototype.hasOwnProperty.call(overrides, channelId)) {
-    return fallback;
-  }
-
-  return normalizeChance(overrides[channelId], fallback);
-}
-
 function getMaxMessageLength() {
   const value = Number(aiChat.maxMessageLength);
   return Number.isFinite(value) && value > 0 ? value : 700;
@@ -90,12 +76,6 @@ function getMaxMessageLength() {
 function getMaxOutputTokens() {
   const value = Number(aiChat.maxOutputTokens);
   return Number.isFinite(value) && value > 0 ? value : 180;
-}
-
-function shouldReplyToEveryMessage() {
-  if (aiChat.replyToEveryMessage === false) return false;
-  if (aiChat.respondToEveryMessage === false) return false;
-  return true;
 }
 
 function isIgnoredCommandLikeMessage(content) {
@@ -267,13 +247,6 @@ function cleanReply(reply) {
   return trimmed.length > 1900 ? `${trimmed.slice(0, 1897)}...` : trimmed;
 }
 
-function addVerityIntroIfNeeded(reply) {
-  if (!shouldReplyToEveryMessage()) return reply;
-  if (/\bverity\b/i.test(reply.slice(0, 180))) return reply;
-
-  return cleanReply(`${pickRandom(INTRO_LINES)} ${reply}`);
-}
-
 async function generateOpenAiReply(message, reason) {
   const openAiClient = getOpenAiClient();
   if (!openAiClient) return null;
@@ -283,7 +256,6 @@ async function generateOpenAiReply(message, reason) {
   const guildNickname = getGuildNickname(message.member);
   const history = channelHistory.get(message.channel.id) || [];
   const content = message.content.slice(0, getMaxMessageLength());
-  const everyMessageMode = shouldReplyToEveryMessage();
 
   const input = [
     {
@@ -297,7 +269,7 @@ Personality:
 - Keep replies short: usually 1-3 sentences.
 - Every reply should feel like a Discord message, not an essay.
 - Mention one Verity lore crumb, assistant joke, or fake archive note when it fits.
-- Start most every-message replies with a varied version of "Hey, I'm Verity, your new personal assistant." Do not copy the exact same sentence every time.
+- When you reply after a ping or trigger word, you can use a varied version of "Hey, I'm Verity, your new personal assistant." Do not copy the exact same sentence every time.
 - If the user asks a direct question, answer it first, then add a small Verity-flavored joke.
 - Do not use slurs, threats, sexual content, or genuinely hateful harassment.
 - Do not invent private personal information about server members.
@@ -314,8 +286,8 @@ ${attitude}
 Why you are replying:
 ${reason}
 
-Every-message mode:
-${everyMessageMode ? "Enabled. You are expected to respond to each eligible user message." : "Disabled. Reply only for pings, trigger words, or random interruptions."}
+Trigger mode:
+Reply only when the bot is pinged or a configured trigger word is used.
 
 Trigger behavior:
 ${triggerInstruction || "No trigger word activated."}
@@ -341,7 +313,7 @@ ${triggerInstruction || "No trigger word activated."}
 async function generateReply(message, reason) {
   try {
     const openAiReply = await generateOpenAiReply(message, reason);
-    if (openAiReply) return addVerityIntroIfNeeded(openAiReply);
+    if (openAiReply) return openAiReply;
   } catch (error) {
     console.error("[AI CHAT] OpenAI reply failed, using static Verity lore fallback:", error);
   }
@@ -367,11 +339,6 @@ module.exports = {
       const botWasPinged = message.mentions.users.has(message.client.user.id);
       const triggerInstruction = getTriggerInstruction(message.content);
       const trafficIsHigh = isHighTraffic(recentMessageCount);
-      const everyMessageMode = shouldReplyToEveryMessage();
-
-      const randomAllowed = now - lastRandomReply > (aiChat.cooldownMs || 90000);
-      const randomReplyChance = getRandomReplyChance(message.channel.id);
-      const shouldRandomlyReply = !trafficIsHigh && randomAllowed && Math.random() < randomReplyChance;
 
       let reason = null;
 
@@ -383,11 +350,6 @@ module.exports = {
         return;
       } else if (trafficIsHigh) {
         return;
-      } else if (everyMessageMode) {
-        reason = "Every-message Verity assistant mode is enabled, so answer this new message.";
-      } else if (shouldRandomlyReply) {
-        reason = "You are randomly butting into the conversation.";
-        lastRandomReply = now;
       } else {
         return;
       }
