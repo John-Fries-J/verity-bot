@@ -34,6 +34,14 @@ You can also copy `.env.example` to `.env` and set `DISCORD_TOKEN` or `OPENAI_AP
 
 If you use the ticket setup command, the bot may update `config.json`, so the mount is writable by default.
 
+The `/join` command plays:
+
+```text
+./sounds/join.mp3
+```
+
+Compose mounts `./sounds` into `/app/sounds` as read-only, so replacing `sounds/join.mp3` on the Pi is enough for the next `/join` run. Keep the filename exactly `join.mp3`.
+
 ## Slash Commands
 
 If slash commands need to be registered or refreshed:
