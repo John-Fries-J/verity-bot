@@ -23,3 +23,10 @@ services:
         target: /app/sounds
         read_only: true
     command: npm start
+    labels:
+      - homepage.group=Bots
+      - homepage.name=Verity Bot
+      - homepage.icon=discord.png
+      - homepage.href=https://192.168.0.14:9443
+      - homepage.description=Discord bot
+
