@@ -1,0 +1,107 @@
+{
+    "token": "",
+    "clientId": "",
+    "guildId": "",
+    "statusName": "Verity lore assistant",
+    "devs": [],
+    "joinleaveID": "",
+    "spamReportChannel": "",
+    "logChannels": {
+        "logChannel": "",
+        "messageDelete": "",
+        "editMessage": "",
+        "threadCreate": "",
+        "threadDelete": "",
+        "threadUpdate": "",
+        "roleLogs": ""
+    },
+    "WelcomeEmbed": {
+        "title": "Welcome to the server!",
+        "description": "Welcome ${user}!",
+        "thumbnail": "",
+        "footer": "Welcome to the server!",
+        "footerIcon": ""
+    },
+    "Twitch": {
+        "ClientId": "",
+        "AccessToken": "",
+        "streamerId": "",
+        "discordChannelId": "",
+        "streamerName": ""
+    },
+    "roleMessageID": "",
+    "roleMappings": {
+        "Event Ping": "",
+        "Video Ping": ""
+    },
+    "roles": {
+        "modRole": "",
+        "adminRole": "",
+        "autoRoleId": "",
+        "autoRoleId1": "",
+        "autoRoleId2": "",
+        "autoRoleId3": ""
+    },
+    "ticketMessageID": "",
+    "ticketCategoryId": "",
+    "ticketRole": "",
+    "mysqlConfig": {
+        "enabled": false,
+        "connectionLimit": 10,
+        "host": "localhost",
+        "user": "",
+        "password": "",
+        "database": "",
+        "insecureAuth": true
+    },
+    "aiChat": {
+        "enabled": true,
+        "replyToEveryMessage": true,
+        "fallbackWhenNoApiKey": true,
+        "apiKey": "",
+        "model": "gpt-4.1-mini",
+        "temperature": 0.9,
+        "maxOutputTokens": 180,
+        "randomReplyChance": 0.02,
+        "cooldownMs": 90000,
+        "maxHistory": 10,
+        "maxMessageLength": 700,
+        "excludedChannel": "",
+        "excludedChannels": [],
+        "restrictToAllowedChannels": false,
+        "allowedChannels": [],
+        "ignoreCommandLikeMessages": false,
+        "ignorePrefixes": ["!", ".", "?"],
+        "channelReplyChanceOverrides": {},
+        "highTrafficGuard": {
+            "enabled": false,
+            "windowMs": 30000,
+            "maxMessages": 20
+        },
+        "roles": {
+            "docAppren": "",
+            "azureScientist": "",
+            "velvetScientist": "",
+            "copperScientist": "",
+            "watchoutTarget": "",
+            "PeriodicRoundtable": ""
+        },
+        "specialUsers": {
+            "kizzy": "",
+            "willow": ""
+        },
+        "triggerWords": {
+            "paint": "Obsess over paint, colors, brush strokes, and the legendary Paint Incident.",
+            "treat": "Activate Treat Protocol: excited, needy, repetitive, and harmless.",
+            "verity": "Explain Verity as a chaotic personal assistant and meme-lore archivist.",
+            "lore": "Reveal a dramatic Verity Archive fact as if it has always been canon."
+        },
+        "lore": {
+            "facts": [
+                "Verity treats every message like a tiny case file.",
+                "The Verity Archive is real enough to blame and fake enough to keep expanding.",
+                "Module Seven is responsible whenever the story needs a suspicious technical excuse."
+            ]
+        }
+    }
+}

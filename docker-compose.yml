@@ -1,0 +1,21 @@
+services:
+  verity-bot:
+    container_name: verity-bot
+    image: verity-bot:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/arm64
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      TZ: ${TZ:-Europe/London}
+      DISCORD_TOKEN: ${DISCORD_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_ADMIN_KEY: ${OPENAI_ADMIN_KEY:-}
+    volumes:
+      - type: bind
+        source: ./config.json
+        target: /app/config.json
+    command: npm start

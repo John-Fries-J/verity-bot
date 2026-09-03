@@ -1,0 +1,17 @@
+.git
+.gitignore
+.idea
+.vscode
+
+node_modules
+npm-debug.log*
+*.log
+
+config.json
+.env
+.env.*
+!.env.example
+
+whitelist.json
+whitelistlogs.json
+data

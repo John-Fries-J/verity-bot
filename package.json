@@ -1,0 +1,38 @@
+{
+  "name": "verity-bot",
+  "version": "1.0.0",
+  "description": "Discord bot with Verity meme lore chat, moderation, tickets, and utility commands",
+  "dependencies": {
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.16.1",
+    "axios": "^1.16.0",
+    "discord.js": "^14.14.1",
+    "ffmpeg-static": "^5.3.0",
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.7.0",
+    "openai": "^6.36.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy:commands": "node scripts/deployCommands.js",
+    "check": "node --check index.js && node --check events/aiChat.js && node --check config.js && node --check verityLore.js && node --check scripts/deployCommands.js",
+    "test": "npm run check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/John-Fries-J/DerpicBot.git"
+  },
+  "keywords": [
+    "discord",
+    "discord",
+    "bots",
+    "discordjs"
+  ],
+  "author": "john-fries-j",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/John-Fries-J/GeneralPurpose-discord-bot/issues"
+  },
+  "homepage": "https://github.com/John-Fries-J/GeneralPurpose-discord-bot#readme"
+}
