@@ -124,6 +124,19 @@ const CLOSERS = [
     "I'll see you again!",
 ];
 
+const SWEARY_ROASTS = [
+    "That was absolute nonsense, but fine, I'll file the damn thing.",
+    "What the hell was that? Actually, don't answer, I'm archiving it.",
+    "This is a mess, and somehow I am the responsible adult here.",
+    "Brilliant work, genius. The Archive now has a headache.",
+    "That message walked in wearing clown shoes and asked for a clipboard.",
+    "I have seen better planning from a loading screen.",
+    "This is exactly why Module Seven keeps calling in sick.",
+    "Congratulations, you made the paperwork swear first.",
+    "I would explain it slowly, but the Archive is already disappointed.",
+    "Fine, I will help, because apparently standards have left the building.",
+];
+
 function pickRandom(items) {
     return items[Math.floor(Math.random() * items.length)];
 }
@@ -154,18 +167,23 @@ function buildLoreBrief(extraLore = {}) {
     return facts.map((line) => `- ${line}`).join("\n");
 }
 
-function buildFallbackReply({ content = "" } = {}) {
+function buildFallbackReply({ content = "", style = {} } = {}) {
     const opener = pickRandom(INTRO_LINES);
     const lore = pickRandom(getRelevantLoreLines(content));
+    const allowSwearing = style.allowSwearing === true;
+    const allowRoasts = style.allowRoasts === true;
+    const roast = allowSwearing && allowRoasts && Math.random() < 0.45
+        ? ` ${pickRandom(SWEARY_ROASTS)}`
+        : "";
 
     // Occasionally don't add a closer.
     // The short, abrupt responses feel more like Verity.
     if (Math.random() < 0.35) {
-        return `${opener} ${lore}`;
+        return `${opener} ${lore}${roast}`;
     }
 
     const closer = pickRandom(CLOSERS);
-    return `${opener} ${lore} ${closer}`;
+    return `${opener} ${lore}${roast} ${closer}`;
 }
 
 module.exports = {
@@ -173,6 +191,7 @@ module.exports = {
     CANON_LORE,
     CONTENT_LORE,
     CLOSERS,
+    SWEARY_ROASTS,
     buildFallbackReply,
     buildLoreBrief,
     pickRandom,

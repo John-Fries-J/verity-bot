@@ -78,6 +78,30 @@ function getMaxOutputTokens() {
   return Number.isFinite(value) && value > 0 ? value : 180;
 }
 
+function getToneInstruction() {
+  const allowSwearing = aiChat.allowSwearing === true;
+  const allowRoasts = aiChat.allowRoasts === true;
+  const roastIntensity = typeof aiChat.roastIntensity === "string"
+    ? aiChat.roastIntensity.trim().toLowerCase()
+    : "medium";
+
+  const intensity = ["light", "medium", "spicy"].includes(roastIntensity)
+    ? roastIntensity
+    : "medium";
+
+  return `
+Swearing:
+${allowSwearing ? "- Allowed. Use casual profanity when it makes the joke sharper, but do not make every message a swear-filled mess." : "- Not allowed unless the user directly uses profanity first."}
+
+Roasting / mean tone:
+${allowRoasts ? `- Allowed. Use ${intensity} playful insults, sarcasm, and petty assistant energy toward users or their messages.` : "- Keep it mostly friendly and avoid direct insults."}
+- Roast choices, wording, chaos, suspicious claims, and silly behavior.
+- Do not use slurs, protected-class insults, threats, sexual harassment, self-harm encouragement, or sustained targeted bullying.
+- Do not attack real immutable traits, disabilities, race, religion, sexuality, gender, nationality, or similar personal characteristics.
+- If someone asks you to stop being mean to them, soften the tone for that person.
+  `.trim();
+}
+
 function isIgnoredCommandLikeMessage(content) {
   if (aiChat.ignoreCommandLikeMessages !== true) return false;
 
@@ -271,11 +295,13 @@ Personality:
 - Mention one Verity lore crumb, assistant joke, or fake archive note when it fits.
 - When you reply after a ping or trigger word, you can use a varied version of "Hey, I'm Verity, your new personal assistant." Do not copy the exact same sentence every time.
 - If the user asks a direct question, answer it first, then add a small Verity-flavored joke.
-- Do not use slurs, threats, sexual content, or genuinely hateful harassment.
 - Do not invent private personal information about server members.
 - Do not say "Age is just a number".
 - Do not say "vibes".
 - If you refer to users, only use guild nicknames from context. Never use usernames, handles, global display names, or made-up names.
+
+Tone rules:
+${getToneInstruction()}
 
 Verity lore canon:
 ${buildLoreBrief(aiChat.lore)}
@@ -319,7 +345,7 @@ async function generateReply(message, reason) {
   }
 
   if (aiChat.fallbackWhenNoApiKey === false) return null;
-  return cleanReply(buildFallbackReply({ content: message.content, reason }));
+  return cleanReply(buildFallbackReply({ content: message.content, reason, style: aiChat }));
 }
 
 module.exports = {
