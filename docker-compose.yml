@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     platform: linux/arm64
+    network_mode: host
     restart: unless-stopped
     init: true
     environment:
@@ -29,4 +30,3 @@ services:
       - homepage.icon=discord.png
       - homepage.href=https://192.168.0.14:9443
       - homepage.description=Discord bot
-

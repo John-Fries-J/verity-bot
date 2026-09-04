@@ -14,6 +14,8 @@ docker compose up -d --build
 
 The Compose file targets `linux/arm64`, suitable for Debian 12 ARM64 on a Raspberry Pi 3.
 
+The container uses host networking. That is intentional for Discord voice because voice connections rely on outbound UDP, which can be unreliable through some Docker bridge/NAT setups on small Linux hosts.
+
 ## Config And Secrets
 
 Do not put real secrets in the Docker image. `config.json` is ignored by Git and excluded from the Docker build context.
@@ -87,5 +89,7 @@ docker compose up -d --build
 ## Notes
 
 No ports are exposed because the bot does not run a web server or API.
+
+Even with host networking, the bot does not listen on a local web port.
 
 No Docker healthcheck is included because this bot has no local HTTP endpoint or reliable process-local health probe for Discord gateway connectivity.

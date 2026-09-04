@@ -3,17 +3,18 @@
   "version": "1.0.0",
   "description": "Discord bot with Verity meme lore chat, moderation, tickets, and utility commands",
   "dependencies": {
-    "@discordjs/opus": "^0.10.0",
-    "@discordjs/voice": "^0.16.1",
+    "@discordjs/voice": "^0.19.2",
     "axios": "^1.16.0",
     "discord.js": "^14.14.1",
-    "ffmpeg-static": "^5.3.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.7.0",
     "openai": "^6.36.0",
-    "tweetnacl": "^1.0.3"
+    "opusscript": "^0.0.8"
   },
   "main": "index.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "start": "node index.js",
     "deploy:commands": "node scripts/deployCommands.js",

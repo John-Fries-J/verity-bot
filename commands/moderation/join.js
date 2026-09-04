@@ -6,6 +6,8 @@ const {
     createAudioPlayer,
     createAudioResource,
     entersState,
+    generateDependencyReport,
+    getVoiceConnection,
     joinVoiceChannel,
     NoSubscriberBehavior,
     VoiceConnectionStatus,
@@ -13,6 +15,8 @@ const {
 const { getAdminRoleId } = require('../../config');
 
 const JOIN_SOUND_PATH = path.join(__dirname, '../../sounds/join.mp3');
+const VOICE_READY_TIMEOUT_MS = 30000;
+let dependencyReportLogged = false;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -33,15 +37,35 @@ module.exports = {
             return interaction.reply({ content: 'Join a VC first.', ephemeral: true });
         }
 
+        const botMember = interaction.guild.members.me || await interaction.guild.members.fetchMe();
+        const botPermissions = channel.permissionsFor(botMember);
+        if (!botPermissions?.has(PermissionFlagsBits.Connect)) {
+            return interaction.reply({ content: `I do not have permission to connect to ${channel.name}.`, ephemeral: true });
+        }
+
+        if (!botPermissions.has(PermissionFlagsBits.Speak)) {
+            return interaction.reply({ content: `I can join ${channel.name}, but I do not have permission to speak there.`, ephemeral: true });
+        }
+
         if (!fs.existsSync(JOIN_SOUND_PATH)) {
             console.warn(`[VOICE] Join sound is missing: ${JOIN_SOUND_PATH}`);
             return interaction.reply({
-                content: 'I can join, but `sounds/join.mp3` is missing from the bot files. Rebuild the Docker image after adding it.',
+                content: 'I can join, but `sounds/join.mp3` is missing from the bot files.',
                 ephemeral: true,
             });
         }
 
         await interaction.deferReply({ ephemeral: true });
+
+        if (!dependencyReportLogged) {
+            console.info(generateDependencyReport());
+            dependencyReportLogged = true;
+        }
+
+        const existingConnection = getVoiceConnection(interaction.guild.id);
+        if (existingConnection) {
+            existingConnection.destroy();
+        }
 
         const connection = joinVoiceChannel({
             channelId: channel.id,
@@ -60,11 +84,13 @@ module.exports = {
         });
 
         try {
-            await entersState(connection, VoiceConnectionStatus.Ready, 15000);
+            await entersState(connection, VoiceConnectionStatus.Ready, VOICE_READY_TIMEOUT_MS);
         } catch (error) {
             connection.destroy();
             console.error('[VOICE] Connection did not become ready:', error);
-            return interaction.editReply({ content: `Joined ${channel.name}, but the voice connection never became ready.` });
+            return interaction.editReply({
+                content: `I tried joining ${channel.name}, but the Discord voice connection never became ready. Check Docker host networking and outbound UDP access.`,
+            });
         }
 
         const player = createAudioPlayer({
